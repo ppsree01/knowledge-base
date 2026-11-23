@@ -1,4 +1,5 @@
 from cloud_storage_card import CloudStorageCard
+from typing import List
 
 class CloudStorage:
 
@@ -25,10 +26,9 @@ class CloudStorage:
         if index_name_from == -1 or index_name_to != -1:
             return False
 
-        data = self.store[index_name_from].copy()
-        data.name = name_to
+        data = CloudStorageCard(name=name_to, size=self.store[index_name_from].size)
         self.store.append(data)
-        self.store = sorted(self.store, key=lambda x: x.name)
+        self.store.sort(key=lambda x: x.name)
         return True
 
     def get_file_size(self, name: str) -> int | None:
@@ -54,22 +54,33 @@ class CloudStorage:
             while start <= end:
                 mid = (start + end) // 2
 
-                if mid == start:
-                    if self.store[start].name == name:
-                        return start
-                    elif self.store[end].name == name:
-                        return end
-                    return -1
-
                 if self.store[mid].name == name:
                     return mid
 
                 elif name > self.store[mid].name:
-                    start = mid
+                    start = mid + 1
                 else:
-                    end = mid
+                    end = mid - 1
             return -1
         except Exception:
             print("Exception occurred")
+            return -1
 
-    
+    def find_by_prefix_and_suffix(self, prefix: str, suffix: str) -> List[str]:
+        result = []
+        if len(self.store) == 0:
+            return result
+        elif len(self.store) == 1:
+            item = self.store[0]
+            if item.name.startswith(prefix) and item.name.endswith(suffix):
+                return [f"{item.name}({item.size})"]
+            return result
+
+        store = sorted(self.store, key=lambda x: (-x.size, x.name))
+        for item in store:
+            if item.name.startswith(prefix) and item.name.endswith(suffix):
+                result.append(f"{item.name}({item.size})")
+
+        return result
+
+
