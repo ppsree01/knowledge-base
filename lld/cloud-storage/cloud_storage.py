@@ -1,23 +1,4 @@
-from dataclasses import dataclass
-
-@dataclass
-class CloudStorageCard:
-    name: str
-    size: int
-
-    def validate_size(self):
-        return self.size > 0 
-
-    def validate_name(self):
-        if not self.name or not self.name.strip():
-            return False
-        return True
-
-    def validate(self):
-        return self.validate_name() and self.validate_size() 
-
-    def copy(self):
-        return CloudStorageCard(name=self.name, size=self.size)
+from cloud_storage_card import CloudStorageCard
 
 class CloudStorage:
 
@@ -45,13 +26,14 @@ class CloudStorage:
             return False
 
         data = self.store[index_name_from].copy()
+        data.name = name_to
         self.store.append(data)
         self.store = sorted(self.store, key=lambda x: x.name)
         return True
 
     def get_file_size(self, name: str) -> int | None:
         if not name or not name.strip():
-            return False
+            return None
 
         index = self.find_file(name)
         if index == -1:
